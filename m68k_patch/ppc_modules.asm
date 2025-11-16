@@ -14858,6 +14858,7 @@ sub_FFC35E92:                           ; CODE XREF: sub_FFC309C0+36↑p
                 dc.b   0
                 dc.b   0
 ; ---------------------------------------------------------------------------
+loc_FFC35EA0:                           ; DATA XREF: ROM:ToolboxTraps↓o
                 movea.l ($BCC).w,a0
                 movea.l ($2B6).w,a1
                 lea     $126(a1),a1

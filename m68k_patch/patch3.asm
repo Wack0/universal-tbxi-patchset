@@ -30,6 +30,12 @@ dummy_rts_for_no_op:
 	include "table_70/set_table.asm"
 	include "table_78/set_table.asm"
 
+	; inlining this here (it's a no-op impl, return addr in a5)
+loc_FFC0A78C:
+	jmp (a5)
+	nop ; for alignment
+
+
 	include "table_70/sub_ffc0a8c0.asm"
 	include "table_extras/code.asm" ; ffc13090-ffc1336c
 	include "table_5c/code.asm" ; ffc20090-ffc2043c
@@ -100,6 +106,7 @@ single_function_end:
 	; Placeholder trap entry point.
 trap_entry_start:
 	dc.l sub_FFC2FF80-$FFC00000 ; PPC trap
+	dc.l loc_FFC35EA0-$FFC00000 ; _Pack9 (PPC browser) 2b
 ; sound traps
 	dc.l sub_FFC5C0FC-$FFC00000 ; SndDisposeChannel 1
 	dc.l sub_FFC5C15A-$FFC00000 ; SndAddModifier 2
@@ -108,6 +115,7 @@ trap_entry_start:
 	dc.l sub_FFC5C276-$FFC00000 ; SndPlay 5
 	dc.l sub_FFC5C3EC-$FFC00000 ; SndControl 6
 	dc.l sub_FFC5BF94-$FFC00000 ; SndNewChannel 7
+	dc.l sub_FFC5BD4E-$FFC00000 ; SysBeep 1c8
 	dc.l sub_FFC5C48C-$FFC00000 ; vSoundDead os b8
 ; serial traps
 	dc.l sub_FFC3ED40-$FFC00000 ; CommToolboxDispatch os 8b
@@ -119,5 +127,7 @@ trap_entry_start:
 	dc.l loc_FFCAFE80-$FFC00000 ; TextServicesDispatch 254
 ; table 38
 	dc.l loc_FFC638F0-$FFC00000 ; IconDispatch 3c9
+; no-op
+	dc.l loc_FFC0A78C-$FFC00000 ; ClkNoMem os 53
 trap_entry_end:
 	dc.l trap_entry_end-trap_entry_start ; length

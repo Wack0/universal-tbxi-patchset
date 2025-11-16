@@ -1,3 +1,19 @@
+	; This patchset is for the first NKv2 tbxi images.
+	; Stuff removed from last NKv1 (1.7.1):
+	; table 201c
+	; table 205c
+	; table 2070
+	; table 2080
+	
+	; table 2010 func +cc
+	; table 2044 had funcs removed from the end
+	
+	; traps removed:
+	; 1-7, 16, 1c8
+	; os: 58-5a, 8b, 93, b8
+	
+	; 2080 / traps 58-5a/os93 are time manager - this got reimplemented ppc...
+
 	include "org.asm"
 	
 	include "traps.asm"
@@ -71,6 +87,7 @@ single_function_end:
 	; Placeholder trap entry point.
 trap_entry_start:
 	dc.l sub_FFC2FF80-$FFC00000 ; PPC trap
+	dc.l loc_FFC35EA0-$FFC00000 ; _Pack9 (PPC browser) 2b
 ; sound traps
 	dc.l sub_FFC5C0FC-$FFC00000 ; SndDisposeChannel 1
 	dc.l sub_FFC5C15A-$FFC00000 ; SndAddModifier 2
@@ -79,6 +96,7 @@ trap_entry_start:
 	dc.l sub_FFC5C276-$FFC00000 ; SndPlay 5
 	dc.l sub_FFC5C3EC-$FFC00000 ; SndControl 6
 	dc.l sub_FFC5BF94-$FFC00000 ; SndNewChannel 7
+	dc.l sub_FFC5BD4E-$FFC00000 ; SysBeep 1c8
 	dc.l sub_FFC5C48C-$FFC00000 ; vSoundDead os b8
 ; serial traps
 	dc.l sub_FFC3ED40-$FFC00000 ; CommToolboxDispatch os 8b

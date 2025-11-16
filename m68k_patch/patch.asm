@@ -1,3 +1,12 @@
+	; Removals from 1.1 to 1.7.1:
+	; tables:
+	; 0x2050
+	; 0x2088
+	; traps: 2b, os dd
+	; 0x2088 implements a bunch of traps,
+	; those traps changed to no longer go through the removed table;
+	; nothing appears to rely on this table being present?
+	; trap 2b is ppc related, missed it before.
 	include "org.asm"
 	
 	include "traps.asm"
@@ -24,5 +33,8 @@ unk_FFCC9C0E:           dc.b 4,'.MPP', 0           ; DATA XREF: sub_FFCC9D00+2Câ
 
 	include "ppc_table_version.asm"
 
-	; Placeholder trap entry point.
-	dc.l sub_FFC2FF80-$FFC00000
+trap_entry_start:
+	dc.l sub_FFC2FF80-$FFC00000 ; PPC trap os dd
+	dc.l loc_FFC35EA0-$FFC00000 ; _Pack9 (PPC browser) 2b
+trap_entry_end:
+	dc.l trap_entry_end-trap_entry_start ; length

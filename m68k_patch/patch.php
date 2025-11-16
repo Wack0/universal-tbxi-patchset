@@ -21,6 +21,8 @@ if (strlen($maincode) == 0) die("could not get main 68k part\n");
 // get the syscall table offset
 $table = @end(unpack('N', substr($maincode, 0x22, 4)));
 $type = 0;
+$ppcTrap = @end(unpack('N', substr($maincode, $table + (0x400 + 0xdd) * 4, 4)));
+if ($ppcTrap != 0) die("no patches needed\n");
 $sndDisposeChannel = @end(unpack('N', substr($maincode, $table + 4, 4)));
 if ($sndDisposeChannel == 0) {
 	$pack15 = @end(unpack('N', substr($maincode, $table + (0x30 * 4), 4)));
@@ -45,16 +47,11 @@ $ppc = substr($ppc, 0, -4);
 // get the syscall table offset
 $table = @end(unpack('N', substr($maincode, 0x22, 4)));
 // replace the traps with our code
-if ($sndDisposeChannel != 0) {
-	// only program-to-program communications trap
-	$trapOff = $table + (0x400 + 0xdd) * 4;
-	$maincode =
-		substr($maincode, 0, $trapOff) .
-		$offset .
-		substr($maincode, $trapOff + 4);
-} else {
+{
 	$trapOffs = [
 		$table + (0x400 + 0xdd) * 4, // program-to-program communications
+		$table + (0x2b) * 4, // Pack9 (PPC browser)
+		// -- type0-1 cutoff --
 		$table + (1) * 4, // SndDisposeChannel
 		$table + (2) * 4, // SndAddModifier
 		$table + (3) * 4, // SndDoCommand
@@ -62,6 +59,7 @@ if ($sndDisposeChannel != 0) {
 		$table + (5) * 4, // SndPlay
 		$table + (6) * 4, // SndControl
 		$table + (7) * 4, // SndNewChannel
+		$table + (0x1c8) * 4, // SysBeep
 		$table + (0x400 + 0xb8) * 4, // vSoundDead
 		$table + (0x400 + 0x8b) * 4, // CommToolboxDispatch
 		$table + (0x16) * 4, // Pack8
@@ -69,6 +67,7 @@ if ($sndDisposeChannel != 0) {
 		$table + (0x30) * 4, // Pack15
 		$table + (0x254) * 4, // TextServicesDispatch
 		$table + (0x3c9) * 4, // IconDispatch
+		$table + (0x400 + 0x53) * 4, // ClkNoMem
 	];
 	
 	$ourOffs = [];
@@ -84,7 +83,8 @@ if ($sndDisposeChannel != 0) {
 			$thisOff .
 			substr($maincode, $trapOffs[$i] + 4);
 	}
-	
+}
+if ($type != 0) {
 	// next set: patches in a single function table
 	// last u32 is count;
 	// preceded by count entries of u16 table_addr ; char offset[2] ; u32 addr
